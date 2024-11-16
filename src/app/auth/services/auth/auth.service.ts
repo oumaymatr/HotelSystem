@@ -8,5 +8,6 @@ const BASIC_URL = "http://localhost:8080/";
 export class AuthService {
 
 constructor(private http: HttpClient) { }
-register (signupRequest: any): Observable<any>
+register (signupRequest: any): Observable<any>{
 return this.http.post(BASIC_URL + "api/auth/signup", signupRequest);}
+}
