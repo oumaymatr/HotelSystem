@@ -4,33 +4,47 @@ const TOKEN = 'token';
 const USER = 'user';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserStorageService {
+  constructor() {}
 
-  constructor() { }
+  // Check if we're running in a browser environment
+  private static isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  }
 
   // Save token to localStorage
   static saveToken(token: string): void {
-    window.localStorage.removeItem(TOKEN); // Corrected `localstorage` to `localStorage`
-    window.localStorage.setItem(TOKEN, token);
+    if (this.isBrowser()) {
+      localStorage.removeItem(TOKEN);
+      localStorage.setItem(TOKEN, token);
+    }
   }
 
   // Save user object to localStorage
   static saveUser(user: any): void {
-    window.localStorage.removeItem(USER);
-    window.localStorage.setItem(USER, JSON.stringify(user));
+    if (this.isBrowser()) {
+      localStorage.removeItem(USER);
+      localStorage.setItem(USER, JSON.stringify(user));
+    }
   }
 
   // Get token from localStorage
   static getToken(): string | null {
-    return window.localStorage.getItem(TOKEN);
+    if (this.isBrowser()) {
+      return localStorage.getItem(TOKEN);
+    }
+    return null;
   }
 
   // Get user object from localStorage
   static getUser(): any {
-    const user = window.localStorage.getItem(USER);
-    return user ? JSON.parse(user) : null;
+    if (this.isBrowser()) {
+      const user = localStorage.getItem(USER);
+      return user ? JSON.parse(user) : null;
+    }
+    return null;
   }
 
   // Get user ID
@@ -47,27 +61,25 @@ export class UserStorageService {
 
   // Check if admin is logged in
   static isAdminLoggedIn(): boolean {
+    if (!this.isBrowser()) return false;
     const token = this.getToken();
-    if (!token) {
-      return false;
-    }
     const role = this.getUserRole();
-    return role === 'ADMIN';
+    return token !== null && role === 'ADMIN';
   }
 
   // Check if customer is logged in
   static isCustomerLoggedIn(): boolean {
+    if (!this.isBrowser()) return false;
     const token = this.getToken();
-    if (!token) {
-      return false;
-    }
     const role = this.getUserRole();
-    return role === 'CUSTOMER';
+    return token !== null && role === 'CUSTOMER';
   }
 
   // Sign out the user
   static signOut(): void {
-    window.localStorage.removeItem(TOKEN);
-    window.localStorage.removeItem(USER);
+    if (this.isBrowser()) {
+      localStorage.removeItem(TOKEN);
+      localStorage.removeItem(USER);
+    }
   }
 }
