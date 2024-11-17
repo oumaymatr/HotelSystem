@@ -40,13 +40,19 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.value).subscribe(
       (res) => {
         console.log(res);
-        if(res.userId != null){
+        if (res.userId != null) {
           const user = {
             id: res.userId,
-            role: res.userRole
-          }
+            role: res.userRole,
+          };
           UserStorageService.saveUser(user);
           UserStorageService.saveToken(res.jwt);
+
+          if (UserStorageService.isAdminLoggedIn()) {
+            this.router.navigateByUrl('/admin/dashboard');
+          } else if (UserStorageService.isCustomerLoggedIn()) {
+            this.router.navigateByUrl('/customer/rooms');
+          }
         }
       },
       (error) => {
